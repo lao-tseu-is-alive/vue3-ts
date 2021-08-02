@@ -1,4 +1,4 @@
-interface iPoint{
+export interface iPoint{
   x:number,
   y:number,
   name?:string,
@@ -23,4 +23,10 @@ export default class Point {
   }
 
   dump=():string => `Point[${this.p.name}](${this.p.x}, ${this.p.y})`;
+
+  move=(x:number, y:number):void => { this.p.x = x; this.p.y = y; }
+
+  rename=(name:string):void => { this.name = name; }
+
+  moveRelative=(dx:number, dy:number):Point => { this.p.x += dx; this.p.y += dy; return this; }
 }

@@ -9,8 +9,6 @@
   text-align: left;
   color: #2c3e50;
   margin-top: 1rem;
-  input{height: 2.5rem}
-  label{float: none;}
 }
 </style>
 
@@ -23,21 +21,21 @@
       </div>
       <div class="two columns">
         <input id="parentPointName" type="text" class="u-full-width"
-               placeholder="your point name" :value="parentPointName">
+               placeholder="your point name" v-model="parentPointName">
       </div>
       <div class="one columns">
         <label for="parentPointName">X:</label>
       </div>
       <div class="three columns">
         <input id="parentPX" class="u-full-width" type="number"
-               placeholder="X value" :value="parentPX"/>
+               placeholder="X value" v-model.number="parentPX"/>
       </div>
       <div class="one columns">
         <label for="parentPointName">Y:</label>
       </div>
       <div class="three columns">
         <input id="parentPY" class="u-full-width" type="number"
-               placeholder="Y value" :value="parentPY"/>
+               placeholder="Y value" v-model.number="parentPY"/>
       </div>
     </div>
     <hr>
