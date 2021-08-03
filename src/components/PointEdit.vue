@@ -18,27 +18,31 @@
         <label for="PointName">Name:</label>
       </div>
       <div class="two columns">
-        <input id="PointName" type="text" class="u-full-width"
+        <input id="PointName" type="text" class="u-full-width" @change="changedPoint"
                placeholder="your point name" v-model="point.name">
       </div>
       <div class="one columns">
         <label for="PX">X:</label>
       </div>
       <div class="three columns">
-        <input id="PX" class="u-full-width" type="number"
+        <input id="PX" class="u-full-width" type="number" @change="changedPoint"
                placeholder="X value" v-model.number="point.x"/>
       </div>
       <div class="one columns">
         <label for="PY">Y:</label>
       </div>
       <div class="three columns">
-        <input id="PY" class="u-full-width" type="number"
+        <input id="PY" class="u-full-width" type="number" @change="changedPoint"
                placeholder="Y value" v-model.number="point.y"/>
       </div>
     </div>
     <div class="row">
-      <div class="four columns">
+      <div class="three columns">
         <label>Move relative:</label>
+      </div>
+      <div class="one columns">
+        <button id="resetxy" aria-keyshortcuts="x" @click="resetXY"
+                class="button-primary u-pull-right">reset XY</button>
       </div>
       <div class="one columns">
         <label for="DX">DX:</label>
@@ -68,7 +72,7 @@
 
 <script lang="ts">
 import {
-  defineComponent, onMounted, ref, watch,
+  defineComponent, onMounted, ref, reactive, watch, SetupContext, computed,
 } from 'vue';
 import Point from '@/components/Point';
 
@@ -79,51 +83,94 @@ export default defineComponent({
     px: { required: true, default: 0 },
     py: { required: true, default: 0 },
   },
-  /* watch: {
-    px(val: number, oldVal: number) {
-      console.log(`IN WATCH px now: ${val},  before: ${oldVal}`);
-      this.point.x = val;
-    },
-    py(val: number, oldVal: number) {
-      console.log(`IN WATCH py now: ${val},  before: ${oldVal}`);
-      this.point.y = val;
-    },
-    pName(val: string, oldVal: string) {
-      console.log(`IN WATCH pName now: ${val},  before: ${oldVal}`);
-      this.point.name = val;
-    },
-  }, */
-  setup(props: { pName: string | undefined; px: number | undefined; py: number | undefined; }) {
-    const point = ref(new Point(props.pName, props.px, props.py));
+
+  setup(props: { pName: string | undefined; px: number ; py: number ; }, ctx: SetupContext) {
+    const point = reactive<Point>(new Point(props.pName, props.px, props.py));
     const deltaX = ref(1);
     const deltaY = ref(1);
-    // methods
+    // ####### computed props
+    // const getClonedPoint = computed(() => {
+    //   console.log('IN COMPUTED getPoint()');
+    //   return new Point(point.name, point.x, point.y);
+    // });
+    // ####### methods
+    const changedPoint = ():void => {
+      console.log('IN changedPoint');
+      ctx.emit('changePoint', point.getPoint());
+    };
     const moveRelX = ():void => {
       console.log(`IN moveRelX(${deltaX.value})`);
-      point.value.moveRelative(deltaX.value, 0);
+      point.moveRelative(deltaX.value, 0);
+      console.log(`IN moveRelX(${deltaX.value})  => point.dump(): ${point.dump()}`);
+      // point.x += 0; // not needed because of getClonedPoint computed property ? Nope...
+      // only by having a ctx.emit in changed point, reactivity works or does not work ... amazing
+      // don't believe me ? comment the next line calling changedPoint and the ctx.emit
+      // and you get reactivity on moveRelY but not on moveRelX
+      changedPoint();
     };
     const moveRelY = ():void => {
       console.log(`IN moveRelY(${deltaY.value})`);
-      point.value.moveRelative(0, deltaY.value);
-      console.log(`IN moveRelY(${deltaY.value})  => this.point.dump(): ${point.value.dump()}`);
+      point.moveRelative(0, deltaY.value);
+      console.log(`IN moveRelY(${deltaY.value})  => point.dump(): ${point.dump()}`);
+      // point.y += 0;
+      changedPoint();
     };
     const moveRelXY = ():void => {
       console.log(`IN moveRelXY(${deltaX.value}, ${deltaY.value})`);
-      point.value.moveRelative(deltaX.value, deltaY.value);
+      point.moveRelative(deltaX.value, deltaY.value);
+      console.log(`IN moveRelXY(${deltaX.value}, ${deltaY.value})  => point.dump(): ${point.dump()}`);
+      // point.x += 0;
+      changedPoint();
     };
-    // watch
+    const resetXY = ():void => {
+      console.log('IN resetXY(0, 0)');
+      point.move(0, 0).rename('');
+      console.log(`IN resetXY(0, 0)  => point.dump(): ${point.dump()}`);
+      // point.x += 0;
+      changedPoint();
+    };
+    // ####### watch
+    // watch for parent change on property px
     watch(() => props.px, (val, oldVal) => {
       console.log(`IN WATCH px now: ${val},  before: ${oldVal}`);
-      if (val !== undefined) {
-        point.value.x = +val;
+      if ((val !== undefined) && (val !== oldVal)) {
+        point.x = +val;
       }
     });
-    // hooks
+    // watch for parent change on property py
+    watch(() => props.py, (val, oldVal) => {
+      console.log(`IN WATCH py now: ${val},  before: ${oldVal}`);
+      if ((val !== undefined) && (val !== oldVal)) {
+        point.y = +val;
+      }
+    });
+    // watch for parent change on property pName
+    watch(() => props.pName, (val, oldVal) => {
+      // remove spaces from name
+      const trimVal:string = String(`${val}`).trim();
+      const trimOldVal:string = String(`${oldVal}`).trim();
+      console.log(`IN WATCH pName now:'${val}', before:'${oldVal}'`);
+      if ((val !== undefined) && (trimVal !== trimOldVal)) {
+        point.name = trimVal;
+      } else {
+        console.log(`IN WATCH pName -> NOTHING TO DO ! (spaces ignored) val.trim():'${trimVal}',  before:'${trimOldVal}'`);
+      }
+    });
+    // ####### hooks
     onMounted(() => {
       console.log(`PointEdit mounted => pName:[${props.pName}](${props.px},${props.py})`);
-      console.log(`PointEdit mounted => ${point.value.dump()}`);
+      console.log(`PointEdit mounted => ${point.dump()}`);
     });
-    return { point, deltaX, deltaY };
+    return {
+      point,
+      deltaX,
+      deltaY,
+      moveRelX,
+      moveRelY,
+      moveRelXY,
+      resetXY,
+      changedPoint,
+    };
   },
 
 });

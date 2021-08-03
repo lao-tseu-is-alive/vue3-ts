@@ -40,12 +40,16 @@
     </div>
     <hr>
     <h5>PointEdit component</h5>
-    <PointEdit :p-name="parentPointName" :px="parentPX" :py="parentPY"/>
+    <PointEdit
+      :p-name="parentPointName" :px="parentPX" :py="parentPY"
+      @changePoint="handleChangedPoint"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
+import { iPoint } from '@/components/Point';
 import PointEdit from './components/PointEdit.vue';
 
 export default defineComponent({
@@ -53,11 +57,20 @@ export default defineComponent({
   components: {
     PointEdit,
   },
-  data() {
+  setup() {
+    const parentPointName = ref('PTest01');
+    const parentPX = ref(2);
+    const parentPY = ref(3);
+    const handleChangedPoint = (val:iPoint) => {
+      console.log('## IN APP handleChangedPoint val:', val);
+      if (val.name != null) {
+        parentPointName.value = val.name;
+      }
+      parentPX.value = val.x;
+      parentPY.value = val.y;
+    };
     return {
-      parentPointName: 'PTest01',
-      parentPX: 1,
-      parentPY: 2,
+      parentPointName, parentPX, parentPY, handleChangedPoint,
     };
   },
 });

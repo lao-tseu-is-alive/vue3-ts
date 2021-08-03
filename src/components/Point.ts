@@ -24,9 +24,14 @@ export default class Point {
 
   dump=():string => `Point[${this.p.name}](${this.p.x}, ${this.p.y})`;
 
-  move=(x:number, y:number):void => { this.p.x = x; this.p.y = y; }
+  getPoint=():iPoint => {
+    const temp:iPoint = { x: this.p.x, y: this.p.y, name: this.p.name };
+    return temp;
+  }
 
-  rename=(name:string):void => { this.name = name; }
+  move=(x:number, y:number):Point => { this.p.x = x; this.p.y = y; return this; }
+
+  rename=(name:string):Point => { this.name = name; return this; }
 
   moveRelative=(dx:number, dy:number):Point => { this.p.x += dx; this.p.y += dy; return this; }
 }
