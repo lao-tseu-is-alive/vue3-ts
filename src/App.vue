@@ -63,8 +63,8 @@ export default defineComponent({
   },
   setup() {
     const parentPointName = ref('PTest01');
-    const parentPX = ref(2);
-    const parentPY = ref(3);
+    const parentPX = ref(50);
+    const parentPY = ref(120);
     const handleChangedPoint = (val:iPoint) => {
       console.log('## IN APP handleChangedPoint val:', val);
       if (val.name != null) {
