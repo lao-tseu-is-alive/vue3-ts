@@ -9,6 +9,10 @@
   text-align: left;
   color: #2c3e50;
   margin-top: 1rem;
+  hr {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
 }
 </style>
 
