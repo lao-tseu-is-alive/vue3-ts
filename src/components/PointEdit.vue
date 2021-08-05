@@ -134,19 +134,44 @@
           id="svgpoint"
           :viewBox="svgViewBox">
           <line id="axex" class="black-line-thick"
-                x1="50" :y1="svgCenterY" x2="450" :y2="svgCenterY"/>
-          <path id="axexarrow" class="black-fill" d="M450 245 L450 255 L470 250 Z" />
-          <template v-for="n in svgMaxScale" v-bind:key="n">
-          <path id="axexoneunit" class="black-line-thin"
-                :d="`M${svgCenterX + (n*svgScale)} 245 L${svgCenterX + (n*svgScale)} 255 `" />
+                x1="0" :y1="svgCenterY" :x2="svgWidth" :y2="svgCenterY"/>
+          <path id="axexarrow" class="black-fill" d="M500 245 L500 255 L520 250 Z" />
+          <template v-for="n in (Math.round((svgMaxScale/svgTick)) - 1)" v-bind:key="n">
+            <path id="axexoneunit" class="black-line-thin"
+                  :d="`M${svgCenterX + ((n)*svgTick * svgScale)} 245
+                   L${svgCenterX + ((n)*svgTick * svgScale)} 255 `" />
+              <g font-size="12" font-family="sans-serif" fill="black"
+                 stroke="none" text-anchor="middle">
+                <text :x="svgCenterX + ((n)*svgTick*svgScale)" y="250" dx="-25" dy="0"
+                      :transform="`rotate(270, ${svgCenterX + ((n)*svgTick*svgScale)}, 250 )`">
+                  {{ `${svgTickDisplay(svgTick, n)}` }}
+                </text>
+              </g>
           </template>
           <line id="axey" class="black-line-thick"
-                :x1="svgCenterX" y1="50" :x2="svgCenterX" y2="450"/>
-          <path id="axeyarrow" class="black-fill" d="M245 50 L255 50 L250 30 Z" />
+                :x1="svgCenterX" y1="15" :x2="svgCenterX" y2="490"/>
+          <path id="axeyarrow" class="black-fill"
+                :d="`M${svgCenterX-5} 30 L${svgCenterX+5} 30 L250 10 Z`"/>
+          <template v-for="n in (Math.round((svgMaxScale/svgTick)) - 1)" v-bind:key="n">
+            <path id="axexoneunit" class="black-line-thin"
+                  :d="`M${svgCenterX - 10} ${svgCenterY - ((n)*svgTick * svgScale)}
+                   L${svgCenterX + 10} ${svgCenterY - ((n)*svgTick * svgScale)}`" />
+            <g font-size="12" font-family="sans-serif" fill="black"
+               stroke="none" text-anchor="middle">
+              <text :x="`${svgCenterX-20}`" :y="svgCenterY - ((n)*svgTick*svgScale)"
+                    dx="-15" dy="0">
+                {{ `${svgTickDisplay(svgTick, n)}` }}
+              </text>
+            </g>
+          </template>
           <circle class="black-line-thin" :cx="svgCenterX" :cy="svgCenterY" r="5" />
           <line id="pointr" class="primary-line-thick"
                 :x1="svgCenterX" :y1="svgCenterY" :x2="svgPointX" :y2="svgPointY"/>
           <circle class="primary-line-thick" :cx="svgPointX" :cy="svgPointY" r="3" />
+          <text :x="svgPointX + 10"
+                :y="svgPointY - 10" dx="0" text-anchor="middle">
+            {{ `${getPointNameTruncaded}:(${point.x}, ${point.y})` }}
+          </text>
         </svg>
       </div>
     </div>
@@ -220,17 +245,30 @@ export default defineComponent({
     });
     const svgMaxScale = computed(():number => {
       console.log(`IN COMPUTED svgMaxScale x,y: (${point.x}, ${point.y})`);
-      const maxVal = point.x > point.y ? point.x : point.y;
-      const maxScale = maxUnit(maxVal);
-      console.log(`IN COMPUTED svgMaxScale maxVal:${maxVal}, maxScale:${maxScale}`);
+      const maxVal = Math.abs(point.x) > Math.abs(point.y) ? Math.abs(point.x) : Math.abs(point.y);
+      let maxScale = maxUnit(maxVal);
+      if ((maxVal > 0) && (maxVal < 1)) maxScale = 1;
+      if ((maxVal > 1) && (maxVal < 11)) maxScale = 10;
+      console.log(`IN COMPUTED svgMaxScale maxVal:${maxVal}, maxUnit(maxVal):${maxUnit(maxVal)} maxScale:${maxScale}`);
       return maxScale;
+    });
+    const svgTick = computed(():number => {
+      console.log(`IN COMPUTED svgTick x,y: (${point.x}, ${point.y})`);
+      let tick = 0.1;
+      if (svgMaxScale.value > 1 && svgMaxScale.value < 11) tick = 1;
+      if (svgMaxScale.value > 10 && svgMaxScale.value < 101) tick = 10;
+      if (svgMaxScale.value > 100 && svgMaxScale.value < 1001) tick = 100;
+      if (svgMaxScale.value > 1000 && svgMaxScale.value < 5001) tick = 500;
+      if (svgMaxScale.value > 5000 && svgMaxScale.value < 10001) tick = 1000;
+      if (svgMaxScale.value > 10000) tick = maxUnit(svgMaxScale.value / 10);
+      console.log(`IN COMPUTED svgTick tick:${tick}`);
+      return tick;
     });
     const svgScale = computed(():number => {
       console.log(`IN COMPUTED svgScale x,y: (${point.x}, ${point.y})`);
-      const maxVal = point.x > point.y ? point.x : point.y;
-      const maxScale = maxUnit(maxVal);
-      const scale = ((svgWidth.value / 2) / maxScale);
-      console.log(`IN COMPUTED svgScale maxVal:${maxVal}, maxScale:${maxScale} scale:${scale}`);
+      const maxScale = svgMaxScale.value;
+      const scale = ((svgWidth.value / 2) / +maxScale);
+      console.log(`IN COMPUTED svgScale maxScale:${maxScale} scale:${scale}`);
       return scale;
     });
     const svgPointX = computed(():number => {
@@ -277,6 +315,13 @@ export default defineComponent({
       console.log(`IN resetXY(0, 0)  => point.dump(): ${point.dump()}`);
       // point.x += 0;
       changedPoint();
+    };
+    const svgTickDisplay = (tick:number, n:number):string => {
+      console.log(`svgTickDisplay(${tick}, ${n})`);
+      if ((tick > 0) && (tick < 1)) {
+        return Number(n * tick).toFixed(2);
+      }
+      return Number(n * tick).toFixed(0);
     };
     // ####### watch
     // watch for parent change on property px
@@ -326,12 +371,14 @@ export default defineComponent({
       svgViewBox,
       svgScale,
       svgMaxScale,
+      svgTick,
       svgPointX,
       svgPointY,
       moveRelX,
       moveRelY,
       moveRelXY,
       resetXY,
+      svgTickDisplay,
       changedPoint,
     };
   },
