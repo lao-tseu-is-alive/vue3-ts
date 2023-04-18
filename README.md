@@ -1,5 +1,10 @@
 # Vue 3 + TypeScript + Vite
 
+A simple example of using TypeScript and Vue3 to make a small component for a 2D point.
+We use also SVG to show the point vector dynamically. 
+
+![Screenshot of the 2D Point Editor](https://raw.githubusercontent.com/lao-tseu-is-alive/vue3-ts/main/images/cgil_vue3_ts_point_edit_example.png)
+
 ## Project initial setup
 ```
 npm install
