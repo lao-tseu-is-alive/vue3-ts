@@ -53,7 +53,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { iPoint } from '@/components/Point';
+import { iPoint } from './components/Point';
 import PointEdit from './components/PointEdit.vue';
 
 export default defineComponent({

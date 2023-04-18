@@ -182,7 +182,7 @@
 import {
   defineComponent, onMounted, ref, reactive, watch, SetupContext, computed,
 } from 'vue';
-import Point from '@/components/Point';
+import Point from './Point';
 
 // eslint-disable-next-line no-restricted-properties
 const maxUnit = (x:number):number => {
