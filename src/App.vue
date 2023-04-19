@@ -21,7 +21,9 @@
   <div class="container">
     <div class="row">
       <div class="twelve columns u-full-width">
-        <button @click="displayPointEditComponent=!displayPointEditComponent">Show PointEdit component</button>
+        <button @click="displayPointEditComponent=!displayPointEditComponent">
+          {{displayPointEditComponent?"Hide":"Show"}} PointEdit component
+        </button>
       </div>
     </div>
     <div class="row">
