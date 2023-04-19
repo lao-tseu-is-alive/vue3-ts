@@ -75,11 +75,11 @@ export default defineComponent({
   border: 1px solid black;
   padding: 1.5rem;
 
-  input, button {
-    //height: 2.5rem
+  input {
+    height: 2.8rem
   }
 
-  @media (min-width: 400px) {
+  @media (min-width: 550px) {
     label {
       text-align: right;
       vertical-align: middle;
