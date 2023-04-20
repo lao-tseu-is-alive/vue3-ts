@@ -22,7 +22,7 @@
     <div class="row">
       <div class="twelve columns u-full-width">
         <button @click="displayPointEditComponent=!displayPointEditComponent">
-          {{displayPointEditComponent?"Hide":"Show"}} PointEdit component
+          {{ displayPointEditComponent ? "Hide" : "Show" }} PointEdit component
         </button>
       </div>
     </div>
@@ -74,6 +74,7 @@
 <script lang="ts">
 import {defineComponent, ref} from 'vue';
 import {iPoint} from './components/Point';
+import {fieldInfo} from './components/FormSchema';
 import PointEdit from './components/PointEdit.vue';
 import DynamicForm from "./components/DynamicForm.vue";
 
@@ -98,14 +99,12 @@ export default defineComponent({
     };
 
     const mySchema = ref({
-      type: 'object',
-      properties: {
-        name: {type: 'string', title: 'Nom'},
-        isWorking: {type: 'boolean', title: 'Est Actif'},
-        age: {type: 'number', title: 'Age'},
-        email: {type: 'string', title: 'Email'},
-      },
-    });
+      name: {title: 'Nom', type: 'string', minLength: 2, maxLength: 100},
+      isWorking: {title: 'Est Actif', type: 'boolean'},
+      salary: {title: 'Salaire', type: 'integer', format: 'int32', minimum: 0},
+      email: {title: 'Email', type: 'string', format: 'email'},
+      birthDate: {title: 'Date de naissance', type: 'string', format: 'date'},
+    } as Record<string, fieldInfo>);
 
     return {
       displayPointEditComponent, parentPointName, parentPX, parentPY, handleChangedPoint, mySchema,
