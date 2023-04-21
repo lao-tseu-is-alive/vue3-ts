@@ -64,7 +64,7 @@
     </div>
     <div class="row">
       <div class="twelve columns u-full-width">
-        <dynamic-form :schema="mySchema"></dynamic-form>
+        <dynamic-form :schema="mySchema" @saveFormData="handleFormSaveEvent"></dynamic-form>
       </div>
     </div>
 
@@ -97,6 +97,9 @@ export default defineComponent({
       parentPX.value = val.x;
       parentPY.value = val.y;
     };
+    const handleFormSaveEvent = (val: Record<string, unknown>) => {
+      console.log('## IN APP handleFormSaveEvent val:', val);
+    };
 
     const mySchema = ref({
       name: {title: 'Nom', type: 'string', minLength: 2, maxLength: 100},
@@ -107,7 +110,7 @@ export default defineComponent({
     } as Record<string, fieldInfo>);
 
     return {
-      displayPointEditComponent, parentPointName, parentPX, parentPY, handleChangedPoint, mySchema,
+      displayPointEditComponent, parentPointName, parentPX, parentPY, handleChangedPoint, handleFormSaveEvent, mySchema,
     };
   },
 });

@@ -253,7 +253,7 @@ export default defineComponent({
       return maxScale;
     });
     const svgTick = computed(():number => {
-      console.log(`IN COMPUTED svgTick x,y: (${point.x}, ${point.y})`);
+      // console.log(`IN COMPUTED svgTick x,y: (${point.x}, ${point.y})`);
       let tick = 0.1;
       if (svgMaxScale.value > 1 && svgMaxScale.value < 11) tick = 1;
       if (svgMaxScale.value > 10 && svgMaxScale.value < 101) tick = 10;
@@ -317,7 +317,7 @@ export default defineComponent({
       changedPoint();
     };
     const svgTickDisplay = (tick:number, n:number):string => {
-      console.log(`svgTickDisplay(${tick}, ${n})`);
+      // console.log(`svgTickDisplay(${tick}, ${n})`);
       if ((tick > 0) && (tick < 1)) {
         return Number(n * tick).toFixed(2);
       }

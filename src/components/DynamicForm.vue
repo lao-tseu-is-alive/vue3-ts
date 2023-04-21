@@ -16,7 +16,7 @@
           <div>Messages</div>
         </div>
         <div class="six columns ">
-          <button class="u-pull-right" type="submit">SAVE</button>
+          <button class="u-pull-right" type="submit" @click="saveFormData">SAVE</button>
         </div>
       </div>
     </form>
@@ -50,10 +50,28 @@ export default defineComponent({
   setup(props: { schema: Record<string, fieldInfo> }, ctx: SetupContext) {
     const form = ref({} as Record<string, unknown>);
 
+    // ####### computed props
     const getFormData = computed((): string => {
+      console.log(`IN COMPUTED getFormData form: (${form.value})`);
       return JSON.stringify(form.value, null, 2)
     })
+    const fields = computed((): Field[] => {
+      console.log(`IN COMPUTED fields `);
+      const tempFields: Field[] = [];
+      for (const [key, value] of Object.entries(props.schema)) {
+        let currentFieldInfo: fieldInfo = value as fieldInfo
+        const currentInputType = getInputType(currentFieldInfo);
+        console.log(`key: ${key}, type:${currentFieldInfo.type},  currentInputType:${currentInputType}`)
+        tempFields.push({
+          key,
+          label: (value as { title?: string }).title || key,
+          type: currentInputType,
+        });
+      }
+      return tempFields;
+    }) // end of computed fields()
 
+    // ####### methods
     const getInputType = (fieldInformation: fieldInfo) => {
       let inputType = fieldInformation.type;
       switch (inputType) {
@@ -77,22 +95,11 @@ export default defineComponent({
       }
       return "text"
     }
-
-    const fields = computed((): Field[] => {
-      const tempFields: Field[] = [];
-      for (const [key, value] of Object.entries(props.schema)) {
-        let currentFieldInfo: fieldInfo = value as fieldInfo
-        const currentInputType = getInputType(currentFieldInfo);
-        console.log(`key: ${key}, type:${currentFieldInfo.type},  currentInputType:${currentInputType}`)
-        tempFields.push({
-          key,
-          label: (value as { title?: string }).title || key,
-          type: currentInputType,
-        });
-      }
-      return tempFields;
-    }) // end of computed fields()
-    return {form, getFormData, fields}
+    const saveFormData = (): void => {
+      console.log('IN saveFormData');
+      ctx.emit('saveFormData', Object.assign({},form.value));
+    };
+    return {form, getFormData, fields, saveFormData}
   } // end of setup
 });
 </script>
