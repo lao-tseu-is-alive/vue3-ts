@@ -1,4 +1,4 @@
-type PositiveNumbers<T extends number> =
+export type PositiveNumbers<T extends number> =
     number extends T
         ? never
         : `${T}` extends `-${string}` | `${string}.${string}`
@@ -18,7 +18,6 @@ export enum numberValidFormatValues {
     float = "float",
     double = "double",
 }
-
 export enum integerValidFormatValues {
     int32 = "int32",
     int64 = "int64",
@@ -33,13 +32,11 @@ export enum stringValidFormatValues {
     text = "text"
 }
 
-function isPositiveInterval(val: number): boolean {
-    return val >= 0;
-}
-
 type numberConstraints = {
     minimum?: number;
+    exclusiveMinimum?: boolean;
     maximum?: number;
+    exclusiveMaximum?: boolean;
 }
 
 export type fieldInfoBoolean = {
@@ -94,4 +91,4 @@ export type fieldInfo = fieldInfoBoolean | fieldInfoInteger | fieldInfoNumber | 
 <input type="week">
 
  */
-type GetValidFormatExtractFieldType<T> = T extends { type: infer U } ? T["type"] : never
+export type GetValidFormatExtractFieldType<T> = T extends { type: infer U } ? T["type"] : never
